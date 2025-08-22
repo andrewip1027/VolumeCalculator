@@ -11,10 +11,10 @@
       justify-content: center;
       height: 100vh;
       text-align: center;
-      font-size: 150%; /* 50% bigger text */
+      font-size: 150%; /* 50% bigger */
     }
     input {
-      width: 80px;
+      width: 100px;
       margin: 10px;
       font-size: 120%;
       text-align: center;
@@ -24,16 +24,30 @@
       padding: 8px 16px;
       margin-top: 10px;
     }
+    #divisor {
+      border: none;
+      background: transparent;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
   <h2>📦 Dimensional Weight Calculator</h2>
+
   <div>
     L <input id="l" type="number"> 
     W <input id="w" type="number"> 
     H <input id="h" type="number">
   </div>
-  <button onclick="calc()">Calculate</button>
+
+  <div>
+    Divisor: 
+    <input id="divisor" type="number" value="139" readonly tabindex="-1"
+           ondblclick="this.removeAttribute('readonly')" 
+           onblur="this.setAttribute('readonly','true')">
+  </div>
+
+  <button id="calcBtn" onclick="calc()">Calculate</button>
   <p id="out"></p>
 
   <script>
@@ -41,15 +55,26 @@
       let l = +document.getElementById('l').value;
       let w = +document.getElementById('w').value;
       let h = +document.getElementById('h').value;
+      let divisor = +document.getElementById('divisor').value;
+
       if (l <= 0 || w <= 0 || h <= 0) {
         document.getElementById('out').innerText = "⚠️ Please enter all dimensions";
         return;
       }
-      let dimWeightLb = Math.ceil((l * w * h) / 139);
+
+      let dimWeightLb = Math.ceil((l * w * h) / divisor);
       let dimWeightKg = (dimWeightLb * 0.45359237).toFixed(2);
+
       document.getElementById('out').innerText = 
-        `Billed weight: ${dimWeightLb} lb (${dimWeightKg} kg)`;
+        `Billed weight = (L × W × H ÷ ${divisor}) = ${dimWeightLb} lb (${dimWeightKg} kg)`;
     }
+
+    // Allow Enter key to trigger calculation
+    document.addEventListener("keydown", function(e) {
+      if (e.key === "Enter") {
+        calc();
+      }
+    });
   </script>
 </body>
 </html>
