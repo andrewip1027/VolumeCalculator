@@ -6,13 +6,40 @@
     body {
       font-family: Arial, sans-serif;
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
       height: 100vh;
-      text-align: center;
+      margin: 0;
       font-size: 150%; /* 50% bigger */
     }
+
+    /* Left notes panel */
+    #notes {
+      width: 30%;
+      background: #f0f0f0;
+      padding: 20px;
+      box-sizing: border-box;
+      border-right: 2px solid #ccc;
+    }
+    #notes h3 {
+      margin-top: 0;
+    }
+    #notes textarea {
+      width: 100%;
+      height: 80%;
+      font-size: 120%;
+      padding: 10px;
+    }
+
+    /* Right calculator area */
+    #main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 20px;
+      text-align: center;
+    }
+
     input {
       width: 100px;
       margin: 10px;
@@ -29,28 +56,57 @@
       background: transparent;
       text-align: center;
     }
+
+    /* Log styling */
+    #log {
+      margin-top: 20px;
+      text-align: left;
+      width: 100%;
+      max-width: 600px;
+      background: black;
+      color: lime;
+      font-family: monospace;
+      padding: 10px;
+      overflow-y: auto;
+      max-height: 300px;
+      border-radius: 5px;
+    }
   </style>
 </head>
 <body>
-  <h2>📦 Dimensional Weight Calculator</h2>
-
-  <div>
-    L <input id="l" type="number"> 
-    W <input id="w" type="number"> 
-    H <input id="h" type="number">
+  <!-- Notes section -->
+  <div id="notes">
+    <h3>📝 Notes</h3>
+    <textarea placeholder="Write your notes here..."></textarea>
   </div>
 
-  <div>
-    Divisor: 
-    <input id="divisor" type="number" value="139" readonly tabindex="-1"
-           ondblclick="this.removeAttribute('readonly')" 
-           onblur="this.setAttribute('readonly','true')">
-  </div>
+  <!-- Calculator + log -->
+  <div id="main">
+    <h2>📦 Dimensional Weight Calculator</h2>
 
-  <button id="calcBtn" onclick="calc()">Calculate</button>
-  <p id="out"></p>
+    <div>
+      L <input id="l" type="number"> 
+      W <input id="w" type="number"> 
+      H <input id="h" type="number">
+    </div>
+
+    <div>
+      Divisor: 
+      <input id="divisor" type="number" value="139" readonly tabindex="-1"
+             ondblclick="this.removeAttribute('readonly')" 
+             onblur="this.setAttribute('readonly','true')">
+    </div>
+
+    <button id="calcBtn" onclick="calc()">Calculate</button>
+    <p id="out"></p>
+
+    <!-- Command-style log -->
+    <div id="log"></div>
+  </div>
 
   <script>
+    let count = 0;
+
     function calc() {
       let l = +document.getElementById('l').value;
       let w = +document.getElementById('w').value;
@@ -62,11 +118,22 @@
         return;
       }
 
-      let dimWeightLb = Math.ceil((l * w * h) / divisor);
-      let dimWeightKg = (dimWeightLb * 0.45359237).toFixed(2);
+      let dimWeightLb = (l * w * h) / divisor;
+      let dimWeightLbFixed = dimWeightLb.toFixed(4);
+      let dimWeightKg = (dimWeightLb * 0.45359237).toFixed(4);
 
-      document.getElementById('out').innerText = 
-        `Billed weight = (L × W × H ÷ ${divisor}) = ${dimWeightLb} lb (${dimWeightKg} kg)`;
+      let result = 
+        `Billed weight = (L × W × H ÷ ${divisor}) = ${dimWeightLbFixed} lb (${dimWeightKg} kg)`;
+
+      document.getElementById('out').innerText = result;
+
+      // Add to log
+      count++;
+      let now = new Date().toLocaleString();
+      let logEntry = `${count}) [${now}] ${result}`;
+      let logBox = document.getElementById('log');
+      logBox.innerText += logEntry + "\n";
+      logBox.scrollTop = logBox.scrollHeight; // auto scroll
     }
 
     // Allow Enter key to trigger calculation
